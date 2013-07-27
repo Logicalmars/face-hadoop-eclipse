@@ -120,9 +120,9 @@ public class Image2String {
 		File actual = new File(folder);
 		for (File f : actual.listFiles())
 		{
-			System.out.println("converting: " + f.getName());
 			if (f.getName().endsWith("ppm"))
 			{
+				System.out.println("converting: " + f.getName());
 				final IplImage img = cvLoadImage(f.getPath());
 				if (img != null)
 					out.println(f.getName() + "\t" + new Image2String().image2String(img));
@@ -133,8 +133,8 @@ public class Image2String {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		encodingFolder("/home/linmengl/workspace/data/Meng");
+//		encodingFolder("/home/linmengl/workspace/data/MengSmall");
 //		encodingTest();
-//		new Image2String().show_collection("/home/linmengl/workspace/face-eclipse/amazon_build/part-m-00000", 5);
+		new Image2String().show_collection("/home/linmengl/workspace/data/MengSmall/collection.txt", 5);
 	}
 }
