@@ -133,8 +133,8 @@ public class Image2String {
 	}
 	
 	public static void main(String[] args) throws IOException {
-//		encodingFolder("data/MengSmall");
-		encodingTest();
+		encodingFolder("/home/linmengl/workspace/data/Meng");
+//		encodingTest();
 //		new Image2String().show_collection("/home/linmengl/workspace/face-eclipse/amazon_build/part-m-00000", 5);
 	}
 }
