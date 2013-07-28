@@ -1,0 +1,146 @@
+
+
+\documentclass[11pt, draftclsnofoot, onecolumn]{IEEEtran} 
+
+\usepackage{epsfig}
+\usepackage{times}
+\usepackage{subfigure}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{url}
+%\usepackage{cite}
+\usepackage{psfrag}
+%\usepackage{stfloats}
+\usepackage{array}
+\usepackage{mdwmath} % part of Mark Wooding's powerful
+\usepackage{mdwtab}  % tools for math, tables, ...
+\usepackage{multirow}
+\usepackage{verbatim}
+%\usepackage{booktabs}
+%\usepackage{rotating}
+\usepackage{color}
+%\usepackage{upgreek}
+%\usepackage{setspace}
+%\usepackage{afterpage}
+
+\newtheorem{thm}{Theorem}
+\newtheorem{cor}[thm]{Corollary}
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{dfn}{Definition}
+\newtheorem{pbm}{Problem}
+\newtheorem{claim}{Claim}
+
+\input{./macros}   % some pre-defined macros
+
+
+\begin{document}
+
+\title{Face Detection  And Recognition On Clusters}
+
+\author{Meng Lin, Ermin Hodzic\\
+        School of Computing Science\\
+        Simon Fraser University\\
+        Surrey/Burnaby, BC, Canada \\
+        menglin@sfu.ca, ehodzic@sfu.ca  \\ 
+    % {\vspace{0.2cm} \large \bf Technical Report, September 2008} 
+}
+
+
+
+\date{}
+\maketitle
+
+\begin{abstract}
+
+The abstract of your work should state the problem, why it is important, 
+and your proposed solution.
+
+\end{abstract}
+
+%%%% The BODY of the document: divided into multiple sections
+
+\section{Introduction} \label{sec:introduction}
+
+With the increase of computational power and big improvements in field of machine learning, we can say that computers are becoming more and more intelligent. Nowadays we have systems which offer a great level of interaction with users in a way that is natural to humans. Computers are able to perform tasks that are far from things natural to machines but close to humans. For example, since humans are visual beings, distinguishing between objects we see, and recognizing those we have seen before (but now in different conditions) are easy tasks for us. However, for computers, it has been a very hard and unnatural problem which still can not be solved with 100\% accuracy. On the other hand, today's software is very advanced and offers excellent results.
+
+Computer face detection and recognition is a topic that has been gaining on popularity over the recent years since face detection tasks are being required more and more. Security cameras combined with real-time face detection and recognition systems is one such example. Also, we know that most of digital cameras and cell phones made in the last decade use some kind of face detection system. Lately, social networks such as Facebook have incorporated face detection and recognition features in their image gallery applications, allowing you to tag people on photos more easily and giving you suggestions on who the people might be. All in all, we are witnesses that demand for face recognition and detection software and algorithms is growing more and more.
+
+Face detection aims to identify and locate faces in images, or videos, usually giving us an outline of the face region. Most of the problems related to face detection lie in variations in scale, orientation, lighting conditions, facial expression etc. Significant progress has been done during the past decade, mostly initiated by the work of Viola and Jones \cite{IWSCTV2001} which enabled real-time face detection due to combination of speed and good results.
+
+Face recognition... // TODO
+
+We have designed and implemented parallel face detection and face recognition framework suitable for use on clusters with many nodes. The method is flexible in the sense that any of the well-known methods for face detection can be used at the lowest level to actually find faces. The goal of our method is to partition the image into subimages such that each part can be independently and efficiently analyzed by any algorithm and the results combined.
+
+\section{Related Work} \label{sec:related}
+
+According to \cite{MIT2000}, the most famous early face recognition system is the one developed by Kohonen in 1989 who used neural nets to perform face recognition on aligned and normalized images by extracting features known as ''eigenfaces'' which capture the most of the important information about the face. However, his system did not perform well in practice due to the need for precise alignment and normalization. Later there appeared improvements to the method (\cite{IEEE1990}) which increased the efficiency of calculating eigenfaces.
+
+More history of face recognition... // TODO
+
+Probably the most important and the most challenging part of face recognition systems is detecting faces in images. The problem can be very hard problem to solve since faces can be rotated, facial expressions may vary, pose may vary, lighting may differ not only across different images but across faces in the same image. Also, not all faces in the same image are necessarily of the same scale. Thus finding all faces in an image has been a challenging and computationally and algorithmically demanding task.
+
+In 1996, \cite{CVPR1996} published a neural networks based approach to finding frontal views of faces in grayscale images and reported a success rate between 78.9\% and 90.5\% of their method.
+
+The paper which probably had the most impact on the area of face detection was the one by Viola and Jones \cite{IWSCTV2001} in 2001. It has made face detection practically feasible in real-time applications. It combines ''integral image'' representation for fast features evaluation, AdaBoost learner for constructing a classifier and a method for combining the classifiers into cascade to quickly identify regions of interest, thus dramatically increasing the speed of the process. The results were comparable to the state of the art of the time and the method was much faster than competition. However, while the haar features used in Viola and Jones method are very simple and effective for frontal face detection, they don't perform as well when face is allowed to be in arbitrary pose. 
+
+In \cite{MSR2010}, they did a survey of recent advances in face recognition in 2010, describing various methods, and concluding that a lot of work still needs to be done to achieve good results in unconstrained settings. They reported about 50-70\% detection rate of the state of the art face detectors with 0.5-3\% false positive rate. In the same year, \cite{TSU2010} have done comparative testing of face detection systems and report VeriLook to be the best in terms of performance, followed by the popular and free-for-use OpenCV.
+
+While there has been work done on parallelizing face detection algorithms, such as Intel's AIM View \cite{IC2012} which is based on OpenCV and utilizes multiple cores on modern processors, moving face detection systems to clusters has not received much attention. 
+
+More on state of art in face recognition... // TODO
+
+% Meng
+There are also former work on Hadoop Mapreduce. In \cite{sweeney2011hipi}, they proposed an open-source Hadoop Image Processing Interface (HIPI). Their goal was to provide a general framework to computer vision research on big data. Usually, identical operations are performed on the whole input set, which makes Hadoop ideal for big data vision research. In their work, they packed images into Image Bundles, because hadoop file system is better working for small number of big files rather than big number of small files\cite{sweeney2011hipi}. HIPI hides the details on image encoding and tranfering, so users can focus on the image itself. Instead of JPEG or PNG, images are distributed as float images with extra header information. As a result, users can filter out unwanted images without decoding and perform pixel-wise operations more easily. 
+
+\section{Research Ideas}  \label{sec:ideas}
+
+With the increase in popularity of cloud computing and writing applications for distributed systems, and since face detection and recognition systems built for clusters have not received much attention, our idea was to design and implement such a system. The goal was to think of an algorithm that would distribute work in such a way that would enable easy parallelization of the job being done, thus making it easier to be done on a cluster. Much care has been put into making it work with MapReduce programming model.
+
+In the case of face detection, one thing this project does not deal with is algorithm for deciding whether there are (and where they are) faces in a given image and we mainly focused on making the job easier by distributing the work. For the job of actually deciding whether there is a face in a given region, we employed the free-to-use solution OpenCV with its underlying Viola-Jones algorithm. Of course, any other tool can be used instead of OpenCV.
+
+First, let us take a look at the way most of current face detection algorithms work. First of all, a face size is assumed. Then whole image is scanned with the fixed scan window size and for each position a classifier is used to decide whether current window location represents a face or not. Window is then scaled to a different size and the process is repeated. In the end, we may end up with many rectangles which overlap a lot. Since they most likely represent the same face, such rectangles are averaged to a single rectangle. Scaling factor is usually set to value between 5\% to 10\% for a good ratio of quality and running speed. Increasing scale factor reduces number of times we scan the whole image and increases running time but then we might skip a scale that would identify a face and thus miss it. Decreasing it will improve sensitivity but also increase running time quite a lot. First way to introduce parallelization would obviously be to distribute different window sizes across multiple workers. Next 
+idea is to split image into subimages so as to reduce space that needs to be scanned at each pass.
+
+For face recognition part... // TODO
+
+To run our solution on the cloud, we plan to pack images into bundle files, inspired by \cite{sweeney2011hipi}.
+
+\section{Problem Statement} \label{sec:problem}
+
+Facial recognition is a problem of determining and identifying faces in images using computers. People have worked on it for decades and there has been much of improvement, mostly in last decade with the advance of digital image and video recording devices. It is a popular area of research in computer vision and has applications in surveillance systems, marketing, video recording, social networks etc.
+
+Obvious application in security systems is real-time location and identification of people being recorded on surveillance cameras. One possible application in marketing would be to have saved preferences for faces detected by the system and to show adds that the person is the most interested in. In digital video recording, such as taking photos with your phone or camera, detecting faces helps automatically adjust focus, lighting and zoom level to better capture people on the image taken. Social networks have been deploying facial recognition algorithms to find people on images. Those are just some of the examples of usage of facial recognition algorithms.
+
+When it comes to face recognition algorithms, we usually divide them in two groups. One is group of algorithms for face detection, and the other is group of algorithms for face recognition.
+
+Face detection is problem of determining locations and size of faces in input images. Output is usually a set of rectangles placed on the original image such that each rectangle contains a face. // More to fill in
+
+Face recognition is problem of identifying a given face with faces in a database and finding matches. // More to fill in
+
+\section{Proposed Solution} \label{sec:solution}
+
+Our project's work is separated into two parts. First part deals only with the problem of detecting faces in images.
+
+
+
+\section{Evaluation} \label{sec:evaluation}
+
+In this section, you demonstrate that your solution is cool 
+and it outperforms previous works. 
+
+\section{Conclusions and Future Work} \label{sec:conclusion}
+
+What are the lessons that we should learn from this paper? 
+What are the possible extensions of this work?
+
+
+%%% The References (are kept in a separate file "refs.bib" in this example. 
+\bibliographystyle{IEEEtran}   
+\bibliography{./refs}    % refs.bib --> should contain all references
+
+
+\end{document}
+
+

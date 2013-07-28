@@ -135,6 +135,6 @@ public class Image2String {
 	public static void main(String[] args) throws IOException {
 //		encodingFolder("/home/linmengl/workspace/data/MengSmall");
 //		encodingTest();
-		new Image2String().show_collection("/home/linmengl/workspace/data/MengSmall/collection.txt", 5);
+		new Image2String().show_collection("/home/linmengl/workspace/data/MengSmall/part-m-00000", 5);
 	}
 }

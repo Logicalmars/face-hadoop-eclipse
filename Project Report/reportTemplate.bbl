@@ -1,0 +1,58 @@
+\begin{thebibliography}{1}
+\providecommand{\url}[1]{#1}
+\csname url@rmstyle\endcsname
+\providecommand{\newblock}{\relax}
+\providecommand{\bibinfo}[2]{#2}
+\providecommand\BIBentrySTDinterwordspacing{\spaceskip=0pt\relax}
+\providecommand\BIBentryALTinterwordstretchfactor{4}
+\providecommand\BIBentryALTinterwordspacing{\spaceskip=\fontdimen2\font plus
+\BIBentryALTinterwordstretchfactor\fontdimen3\font minus
+  \fontdimen4\font\relax}
+\providecommand\BIBforeignlanguage[2]{{%
+\expandafter\ifx\csname l@#1\endcsname\relax
+\typeout{** WARNING: IEEEtran.bst: No hyphenation pattern has been}%
+\typeout{** loaded for the language `#1'. Using the pattern for}%
+\typeout{** the default language instead.}%
+\else
+\language=\csname l@#1\endcsname
+\fi
+#2}}
+
+\bibitem{IWSCTV2001}
+P.~Viola and M.~Jones, ``Robust real-time object detection,'' \emph{Second
+  International Workshop On Statistical And Computational Theories Of Vision
+  – Modeling, Learning, Computing, And Sampling}, July 2001.
+
+\bibitem{MIT2000}
+A.~Pentland and T.~Choudhury, ``Personalizing smart environments: Face
+  recognition for human interaction,'' The Media Laboratory, Massachusetts
+  Institute of Technology, Tech. Rep., January 2000.
+
+\bibitem{IEEE1990}
+M.~Kirby and L.~Sirovich, ``Application of the karhunen-loeve procedure for the
+  characterization of human faces,'' \emph{IEEE Pattern Analysis and Machine
+  Intelligence}, vol.~12, no.~1, pp. 103--108, 1990.
+
+\bibitem{CVPR1996}
+S.~B. Henry A.~Rowley and T.~Kanade, ``Neural network-based face detection,''
+  \emph{Computer Vision and Pattern Recognition}, 1996.
+
+\bibitem{MSR2010}
+C.~Zhang and Z.~Zhang, ``A survey of recent advances in face detection,''
+  Microsoft Research, Tech. Rep. MSR-TR-2010-66, June 2010.
+
+\bibitem{TSU2010}
+N.~Degtyarev and O.~Seredin, ``Comparative testing of face detection
+  algorithms,'' 2010.
+
+\bibitem{IC2012}
+A.~Ranjan and S.~Malik, ``Parallelizing a face detection and tracking system
+  for multi-core processors,'' \emph{2012 Ninth Conference on Computer and
+  Robot Vision}, 2012.
+
+\bibitem{sweeney2011hipi}
+C.~Sweeney, L.~Liu, S.~Arietta, and J.~Lawrence, ``Hipi: A hadoop image
+  processing interface for image-based mapreduce tasks,'' \emph{Chris.
+  University of Virginia}, 2011.
+
+\end{thebibliography}
