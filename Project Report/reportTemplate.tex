@@ -54,10 +54,7 @@
 
 \begin{abstract}
 
-The abstract of your work should state the problem, why it is important, 
-and your proposed solution.
-
-The ability to find faces on images and determine who the faces belong to using computers is a problem researchers have been working on for decades. With the advancements of image recognition algorithms, mostly during the last decade, today we have fast and sufficiently accurate systems. As cloud computing is gaining on popularity, demand for applications written for distributed systems is on the rise. Whil there are solutions for single-machine parallel face detection and recognition, interest in distributed solutions seems low.
+The ability to find faces on images and determine who the faces belong to using computers is a problem researchers have been working on for decades. With the advancements of image recognition algorithms, mostly during the last decade, today we have fast and sufficiently accurate systems. As cloud computing is gaining on popularity, demand for applications written for distributed systems is on the rise. While there are solutions for single-machine parallel face detection and recognition, interest in distributed solutions seems low. In this paper, we propose and implement a solution that solves face detection and recognition on distributed cloud systems.
 
 \end{abstract}
 
@@ -145,9 +142,11 @@ Our project's work is separated into two parts. First part deals only with the p
 \label{fig:recog_overview}
 \end{figure}
 
-For face recognition, we spread training images to different nodes to improve speed. In terms of mapreduce, each mapper will make its own prediction and emit (prediction, confidence) pairs as new value, see fig.\ref{fig:recog_overview}. The emit key is set to ''KEY'' so that every prediction comes to the same reducer. Each reducer will combine these pairs, in the way that only the most confident one remains. We also introduce a Combiner to locally reduce mapper results. 
+For face recognition, Our idea is to spread training images to different nodes, so that each computing node can make its own prediction, in parallel. See fig.\ref{fig:recog_overview}. 
 
-In order to reduce data transmition, we only put the path of recognizers in the hadoop input. 
+In the training phrase, we split the trainning data into several folds, and each fold will generate an independent recognizer. We can dump these recognizors to file system. Then, in the testing phrase, when a new test image comes, we generate a hadoop input file. This file contains the recognizer and the test image in each line, which will be distributed to each mapper later on. Every mapper will load the recognizer data and make its own prediction for the test image. (Prediction, Confidence) pairs are emitted as values to the reducer. The emitted keys are always ''KEY'' so that every prediction comes to the same reducer. Each reducer will combine these pairs, in the way that only the most confident one remains. We also introduce a Combiner to locally reduce mapper results. 
+
+In order to reduce data transmition, we only put the path of recognizers in the hadoop input. All the recognizers will be dumped 
 
 \section{Evaluation} \label{sec:evaluation}
 
@@ -166,5 +165,4 @@ What are the possible extensions of this work?
 
 
 \end{document}
-
 
