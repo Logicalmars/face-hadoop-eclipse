@@ -43,6 +43,9 @@ public class DistFaceRecognition extends Configured implements Tool{
 			if (new File(path2 + filename).exists())
 				return path2 + filename;
 			
+			if (new File(path3 + filename).exists())
+				return path3 + filename;			
+			
 			System.err.println("Can't find recognizer!!");
 			return filename;
 		}

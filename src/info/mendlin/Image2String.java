@@ -51,7 +51,7 @@ public class Image2String {
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}		
+		}
 	}
 	
 	public String image2String(IplImage image) throws IOException
@@ -118,6 +118,7 @@ public class Image2String {
 		PrintWriter out = new PrintWriter(folder + "/collection.txt");
 		
 		File actual = new File(folder);
+		int count = 0;
 		for (File f : actual.listFiles())
 		{
 			if (f.getName().endsWith("ppm"))
@@ -125,16 +126,22 @@ public class Image2String {
 				System.out.println("converting: " + f.getName());
 				final IplImage img = cvLoadImage(f.getPath());
 				if (img != null)
+				{					
 					out.println(f.getName() + "\t" + new Image2String().image2String(img));
+					count ++;
+				}
 				else
 					System.out.println("fail");
 			}
+			
+			if (count == 100)
+				break;
 		}
 	}
 	
 	public static void main(String[] args) throws IOException {
-//		encodingFolder("/home/linmengl/workspace/data/MengSmall");
+		encodingFolder("/home/linmengl/workspace/data/Meng");
 //		encodingTest();
-		new Image2String().show_collection("/home/linmengl/workspace/data/MengSmall/part-m-00000", 5);
+//		new Image2String().show_collection("/home/linmengl/workspace/data/MengSmall/part-m-00000", 5);
 	}
 }
