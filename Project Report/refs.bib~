@@ -180,3 +180,12 @@
   journal={Chris. University of Virginia},
   year={2011}
 }
+
+@inproceedings{zhang2010case,
+  title={Case study of scientific data processing on a cloud using hadoop},
+  author={Zhang, Chen and De Sterck, Hans and Aboulnaga, Ashraf and Djambazian, Haig and Sladek, Rob},
+  booktitle={High performance computing systems and applications},
+  pages={400--415},
+  year={2010},
+  organization={Springer}
+}
