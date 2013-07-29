@@ -130,9 +130,11 @@ Face detection is a problem of determining locations and sizes of faces in input
 
 Face recognition is a problem of identifying a given face with faces in a database. User inputs a face image and the system returns the user's identity, or the closest match if there is no ''exact match'' (some might argue that exact matches are meaningless and result should simply be a set of closest images). Some systems may always return a list of users that look similar to the one on input image. We do not provide similar face list in the implementation of our solution.
 
-Moving to distributed systems (clouds), problem of face detection and recognition we deal with is how to organize input data so as to enable easy parallelization and distribution of work, retaining or gaining on speed and moving a step closer to having a fully working, efficient both in speed and space and traffic consumed and an easy to use solution.
+Moving to distributed systems (clouds), problem of face detection and recognition we deal with is how to organize input data so as to enable easy parallelization and distribution of work, retaining or gaining on speed and moving a step closer to having a fully working, efficient both in speed and space and traffic consumed and an easy to use solution. In the next section we describe the proposed solution and then show the results of our evaluation of the framework using OpenCV.
 
 \section{Proposed Solution} \label{sec:solution}
+
+\subsection{Face Detection}
 
 \begin{wrapfigure}{r}{0.55\textwidth}
 \centering
@@ -142,7 +144,7 @@ Moving to distributed systems (clouds), problem of face detection and recognitio
 
 Let us first turn our attention to the problem of finding faces in images.
 
-As indicated in previous chapter, and as it can be seen on Fig.2, our method pre-processes input image. First parameter to detection part is face size. Since faces on the image can be of any size, we need to check as many as possible. The algorithm starts looking for a face of size \emph{face\_size} being set to maximum - checking whether the wole image is one big face. It then scales down \emph{face\_size} and partitions the image into blocks accordingly (refer to Fig.3).
+As indicated in previous chapter, and as it can be seen on Fig. 2, our method pre-processes input image. First parameter to detection part is face size. Since faces on the image can be of any size, we need to check as many as possible. The algorithm starts looking for a face of size \emph{face\_size} being set to maximum - checking whether the wole image is one big face. It then scales down \emph{face\_size} and partitions the image into blocks accordingly (refer to Fig. 3).
 
 \begin{figure}[t!]
 \centering
@@ -150,9 +152,9 @@ As indicated in previous chapter, and as it can be seen on Fig.2, our method pre
 \caption{An illustration of image partitioning given the window size (assumed face size). Mesh with white lines is the cut based on window size. Green, yellow, red, purple and blue boxes represent examples of different scan areas. Scan areas overlap to make sure we don't miss any face on the boundary. Gray-shaded region represents parts of the image that cannot contain a face alone, because they are smaller than assumed face size.}
 \end{figure}
 
-We then treat all macroblocks (accross all different face sizes) consisting of 4 neighbouring blocks as potential search areas that are fed as input to classifier. Since macroblocks have width and height $2 \cdot face\_size$ every face must be contained in at least one macroblock, so classifier will not miss it. In our implementation, to ensure that there happen no repetitions of scanned regions due to scaling in OpenCV's algorithm, we fixed the size of face each time we ran the classifier. That improved running time but then we had to be careful with scaling and partitioning to ensure that we do not miss anything OpenCV would otherwise find.
+We then treat all macroblocks (accross all different face sizes) consisting of 4 neighbouring blocks as potential search areas that are fed as input to classifier. Since macroblocks have width and height $2 \cdot face\_size$ every face must be contained in at least one macroblock, so classifier will not miss it. In our implementation, to ensure that there happen no repetitions of scanned regions due to scaling in OpenCV's algorithm, we fixed the size of face each time we ran the classifier. That improved running time but then we had to be careful with scaling and partitioning to ensure that we do not miss anything OpenCV would otherwise find if inner scaling was allowed.
 
-After mapping is done and faces are detected, output is a collection of rectangles. Many of those rectangles may overlap quite a lot indicating they represent same face identified at different scale of $face\_size$ and from different macroblocks. Thus we need to do a post-processing step to find all such clusters of rectangles and average them out. It can be done by a simply line sweep algorithm; sort rectangles and scan them from left to right and top to bottom, replacing clusters of overlapping rectangles with a single one. That way we remove redundancy in the output. 
+After mapping is done and faces are detected, output is a collection of rectangles. Many of those rectangles may overlap quite a lot indicating they represent same face identified at different scale of $face\_size$ and from different macroblocks. Thus we need to do a post-processing step to find all such clusters of rectangles and average them out. It can be done by a simple line sweep algorithm; sort rectangles and scan them from left to right and top to bottom, replacing clusters of overlapping rectangles with a single one. That way we remove redundancy in the output. 
 
 \begin{figure}
 \centering
@@ -163,22 +165,37 @@ After mapping is done and faces are detected, output is a collection of rectangl
 
 \subsection{Face Recognition}
 
-For face recognition, the idea is to assign training images to different nodes, so that each computing node can make its own prediction, in parallel (refer to Fig.\ref{fig:recog_overview}). 
+For face recognition, the idea is to assign training images to different nodes, so that each computing node can make its own prediction, in parallel (refer to Fig. \ref{fig:recog_overview}). 
 
-In the training phrase, we split the trainning data into several folds, and each fold will generate an independent recognizer. We can dump these recognizers to file system. Then, in the testing phrase, when a new test image comes, we generate a hadoop input file. This file contains the recognizers and the test image in each line, which will be distributed to each mapper later on. Every mapper will load the recognizer data and make its own prediction for the test image. (Prediction, Confidence) pairs are emitted as values to the reducer. The emitted keys are always ''KEY'' so that every prediction comes to the same reducer. The reducer will combine these pairs, in the way that only the most confident one remains. We also introduce a Combiner to locally reduce mapper results.
+In the training phase, we split the training data into several folds, and each fold will generate an independent recognizer. We can dump these recognizers to file system. Then, in the testing phase, when a new test image comes, we generate a Hadoop input file. This file contains the recognizers and the test image in each line, which will be distributed to each mapper later on. Every mapper will load the recognizer data and make its own prediction for the test image. (Prediction, Confidence) pairs are emitted as values to the reducer. The emitted keys are always ''KEY'' so that every prediction comes to the same reducer. The reducer will combine these pairs, in the way that only the most confident one remains. We also introduce a Combiner to locally reduce mapper results.
 
 In order to reduce data transmition, we only put the file path of recognizers in the hadoop input. All the recognizers are copied to hadoop nodes before testing.
+
+To train independent recognizers, we use $EigenFaceRecognizer$, which analyze training images with The Principal Component Analysis (PCA). PCA will greatly reduce the dimensionality of image representation, so that we only focus on the components that account for most of the information.\cite{faceRecognizer}. The Eigenfaces method recognize face in three major steps:
+
+1. Do PCA on training face set, and project all the training samples into PCA subspace.
+2. Project the query image into the PCA subspace.
+3. Finding the nearest neighbor inside PCA subspace, and determine query image’s label based on them.
+
+The result of the first step contains all the information needed by a $recognizer$, so we dump it into the hard disk. The information includes eigenvalues, eigenvectors and projections of all training images. Some eigenfaces can be seen in Fig.\ref{fig:eigenfaces}.
+
+\begin{figure}
+\centering
+\includegraphics[height=300pt]{eigenfaces}
+\caption{Trained eigenfaces. All the database images are normalized to the same size before training.}
+\label{fig:eigenfaces}
+\end{figure}
 
 \begin{figure}
 \centering
 \includegraphics[height=300pt]{hadoop_face_detection}
-\caption{Detailed workflow of face detection on hadoop. (a)Input image is first segmented according to different window sizes, then serialized into text string, and stored in Map input text. Filename together with window position and size are used as key. (b)Each mapper is fed with one line from the Map input text, and a sub-image can be de-serialized. We run OpenCV face detection with fixed window size on this sub-image. If there is a face, the surrounding rectangle will be emitted to reducer. The reducer merge overlapping rectangles into one.}
+\caption{Detailed workflow of face detection on hadoop. (a) Input image is first segmented according to different window sizes, then serialized into text string, and stored in Map input text. Filename together with window position and size are used as key. (b) Each mapper is fed with one line from the Map input text, and a sub-image can be de-serialized. We run OpenCV face detection with fixed window size on this sub-image. If there is a face, the surrounding rectangle will be emitted to reducer. The reducer merges overlapping rectangles into one.}
 \label{fig:hadoop_face_detection}
 \end{figure}
 
 \subsection {General Hadoop Image Process}
 
-Hadoop's default input and output format is text file. Although we can implement our own InputSplit and RecordReader to accommodate image input, we choose to store images as text strings. The first reason is, hadoop's IO is only performed on disks, and its file system is not good at reading and writing many small, noncontinuous files. Instead, it's good at big files with large chunk, \cite{sweeney2011hipi}. After we turn every image into string, we can pack them line by line into large files, and at the same time enjoy hadoop's default $TextInputFormat$, which will greatly reduce our programming workload. Finally, hadoop has many hidden parameters, like the number of mappers and reducers. We believe sticking to the default file format will give us better performance, since these parameters are better tuned in default situation. We employ Base64 as the final string codec, in order to eliminate unexpected EOF or EOL inside image string.
+Hadoop's default input and output format is text file. Although we can implement our own InputSplit and RecordReader to accommodate image input, we choose to store images as text strings. The first reason is, Hadoop's IO is only performed on disks, and its file system is not good at reading and writing many small, noncontinuous files. Instead, it's good at dealing with big files \cite{sweeney2011hipi}. After we turn every image into string, we can pack them line by line into large files, and at the same time enjoy Hadoop's default $TextInputFormat$, which will greatly reduce our programming workload. Finally, Hadoop has many hidden parameters, like the number of mappers and reducers. We believe sticking to the default file format will give us better performance, since these parameters are better tuned in default situation. We employ Base64 as the final string codec, in order to eliminate unexpected EOF or EOL inside image string.
 
 We take face detection as an example and detailed workflow is shown in Fig. \ref{fig:hadoop_face_detection}.
 
@@ -190,13 +207,13 @@ We take face detection as an example and detailed workflow is shown in Fig. \ref
 
 \section{Evaluation} \label{sec:evaluation}
 
-In this part, we evaluate the speed of face detection and recognition. The accuracy is not evaluated, because we leave the accuracy problem to OpenCV.
+In this part, we evaluate the speed of face detection and recognition. The accuracy is not evaluated due to aim of our project to be a generalized framework allowing any classifier to be used and because it is based on how well OpenCV handles small search windows with fixed scale.
 
-The solutions have been tested on both Hadoop local filesystem and on Amazon cloud. Implementation was done using JavaCV (java version of OpenCV). For face detection, in pre-processing stage all input images are segmented across different face sizes and stored in a collection input text file. In mapping stage of face detection, subimages were read with filenames as keys and coordinates and dimensions as value. On each subimage, OpenCV's Haar classifier method was called to find faces with fixed window size. Mapping output is filename as key and coordinates of rectangles that contain faces as values. In reduce stage, all rectangles that belong to same image are grouped due to having same key, ready to be post-processed by rectangle-averaging algorithm to remove redundancy in output rectangles.
+The solutions have been tested on both Hadoop local filesystem and on Amazon cloud. Implementation was done using JavaCV (java version of OpenCV). For face detection, in pre-processing stage all input images are segmented across different face sizes and stored in a collection input text file. In mapping stage of face detection, subimages were read with filename, coordinates and dimensions as keys and string encoding of the image as value. On each subimage, OpenCV's Haar classifier method was invoked to find faces with fixed window size. Mapping output is filename as key and coordinates of rectangles (with offsets relative to original unsegmented image) that contain faces as values. In reduce stage, all rectangles that belong to same image are grouped due to having same key, ready to be post-processed by rectangle-averaging algorithm to remove redundancy in output rectangles.
 
-Average running time on Hadoop
+Average running time on local Hadoop Mapreduce for a single image is around 28 seconds and for 10 images it is 65 seconds, giving us average time of roughly 4 seconds per image ignoring time spent on initialization of nodes and starting the job. On Amazon EMR, using one master node and 5 small worker nodes, time spent on processing single image was around 96 seconds, while time spent on processing 10 images was around 140 seconds
 
-The biggest drawback of the framework are repetitions. For each image and each window size, subimages were generated according to partition based on window size. As can be easily seen on Fig. 5, this introduces a lot of repeated segments of the image being copied over and over. Since there are $\log_{scaleFactor}{imageSize}$ different window sizes and almost all windows are repeated in 4 scan areas, given a fixed window size, there is approximately $O(\frac{imageSize}{minimumWindowSize})^{2} $ subimages, which is a lot. With scale factor 1.05 and minimum window size 25, more than 100MB big input file is generated for an image of size 650x500.
+The biggest drawback of the face detection framework are repetitions. For each image and each window size, subimages were generated according to partition based on window size. As can be easily seen on Fig. 5, this introduces a lot of repeated segments of the image being copied over and over. Since there are $\log_{scaleFactor}{imageSize}$ different window sizes and almost all windows are repeated in 4 scan areas, given a fixed window size, there is approximately $O(\frac{imageSize}{minimumWindowSize})^{2} $ subimages, which is a lot. With scale factor 1.05 and minimum window size 25, more than 100MB big input file is generated for an image of size 650x500.
 
 FDSegment: 1pic: 187MB, 95.66s; 4 pic: 870MB, 111.11s; 10 pic: 1.7GB, 140.37s (1 master, 5 core); 64.94s (local hadoop)
 FRDist: 2 core: 69.92s, 4 core: 85.66s
