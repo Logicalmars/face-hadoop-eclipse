@@ -1,7 +1,5 @@
 package info.mendlin;
 
-import com.googlecode.javacv.cpp.opencv_core;
-import com.googlecode.javacv.cpp.opencv_core.CvMat;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
 import static com.googlecode.javacv.cpp.opencv_highgui.*;
@@ -9,7 +7,8 @@ import static com.googlecode.javacv.cpp.opencv_core.*;
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 import static com.googlecode.javacv.cpp.opencv_contrib.*;
 import java.io.File;
-import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 //Local test is done on "att_faces", The ORL face database
 public class LocalFaceRecognition {
@@ -44,11 +43,11 @@ public class LocalFaceRecognition {
 	
 	public static void test(int personStart, int personStop)
 	{
-		FaceRecognizer faceRecognizer = createEigenFaceRecognizer();
+		FaceRecognizer faceRecognizer = createEigenFaceRecognizer();		
 		faceRecognizer.load(String.format("att_faces/%d_to_%d_trainning.xml", personStart, personStop));
 		
-		for (int personid = personStart; personid < personStop;personid++)
-		{
+		for (int personid = personStart; personid < personStop; personid++)
+		{	
 			String path = "att_faces/s" + personid + "/10.pgm";			
 			IplImage img = cvLoadImage(path);
             IplImage grayImg = IplImage.create(img.width(), img.height(), IPL_DEPTH_8U, 1);
@@ -61,8 +60,36 @@ public class LocalFaceRecognition {
 		}
 	}
 	
+	public static void genHadoopInput(int test_personid)
+	{
+		try {
+			String path = "att_faces/s" + test_personid + "/10.pgm";
+			IplImage img = cvLoadImage(path);
+			String imgstr = new Image2String().image2String(img);
+			
+			PrintWriter out = new PrintWriter("att_faces/collection.txt");
+			
+			for (File file : new File("att_faces").listFiles())
+			{
+				if (file.getName().endsWith("_trainning.xml"))
+				{
+					out.println(file.getName() + "\t" + imgstr);					
+				}
+			}
+			
+			out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
     public static void main(String[] args) {
-//        train(1, 10);
-    	test(1, 10);
+//    	train(1, 11);
+//    	train(11, 21);
+//    	train(21, 31);
+//    	train(31, 41);
+//    	test(21, 31);
+    	genHadoopInput(17);
     }
 }
