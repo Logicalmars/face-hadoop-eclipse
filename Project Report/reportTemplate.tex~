@@ -37,7 +37,7 @@
 
 \begin{document}
 
-\title{Face Detection  And Recognition On Clusters}
+\title{Face Detection And Recognition For Distributed Systems}
 
 \author{Meng Lin, Ermin Hodzic\\
         School of Computing Science\\
@@ -57,6 +57,8 @@
 The abstract of your work should state the problem, why it is important, 
 and your proposed solution.
 
+The ability to find faces on images and determine who the faces belong to using computers is a problem researchers have been working on for decades. With the advancements of image recognition algorithms, mostly during the last decade, today we have fast and sufficiently accurate systems. As cloud computing is gaining on popularity, demand for applications written for distributed systems is on the rise. Whil there are solutions for single-machine parallel face detection and recognition, interest in distributed solutions seems low.
+
 \end{abstract}
 
 %%%% The BODY of the document: divided into multiple sections
@@ -72,6 +74,12 @@ Face detection aims to identify and locate faces in images, or videos, usually g
 Face recognition... // TODO
 
 We have designed and implemented parallel face detection and face recognition framework suitable for use on clusters with many nodes. The method is flexible in the sense that any of the well-known methods for face detection can be used at the lowest level to actually find faces. The goal of our method is to partition the image into subimages such that each part can be independently and efficiently analyzed by any algorithm and the results combined.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=300]{img2}
+\caption{An example of face detection using OpenCV. Image taken from wikipedia: \url{http://en.wikipedia.org/wiki/File:Face_detection.jpg}}
+\end{figure}
 
 \section{Related Work} \label{sec:related}
 
@@ -91,6 +99,9 @@ While there has been work done on parallelizing face detection algorithms, such 
 
 More on state of art in face recognition... // TODO
 
+% Meng
+For image processing on Hadoop Mapreduce. In \cite{sweeney2011hipi}, they proposed an open-source Hadoop Image Processing Interface (HIPI). Their goal was to provide a general framework to computer vision research on big data. Usually, identical operations are performed on the whole input set, which makes Hadoop ideal for big data vision research. In their work, they packed images into Image Bundles, because hadoop file system is better working for small number of big files rather than big number of small files\cite{sweeney2011hipi}. HIPI hides the details on image encoding and tranfering, so users can focus on the image itself. Instead of JPEG or PNG, images are distributed as float images with extra header information. As a result, users can filter out unwanted images without decoding, and perform pixel-wise operations like croping more easily. 
+
 \section{Research Ideas}  \label{sec:ideas}
 
 With the increase in popularity of cloud computing and writing applications for distributed systems, and since face detection and recognition systems built for clusters have not received much attention, our idea was to design and implement such a system. The goal was to think of an algorithm that would distribute work in such a way that would enable easy parallelization of the job being done, thus making it easier to be done on a cluster. Much care has been put into making it work with MapReduce programming model.
@@ -100,7 +111,10 @@ In the case of face detection, one thing this project does not deal with is algo
 First, let us take a look at the way most of current face detection algorithms work. First of all, a face size is assumed. Then whole image is scanned with the fixed scan window size and for each position a classifier is used to decide whether current window location represents a face or not. Window is then scaled to a different size and the process is repeated. In the end, we may end up with many rectangles which overlap a lot. Since they most likely represent the same face, such rectangles are averaged to a single rectangle. Scaling factor is usually set to value between 5\% to 10\% for a good ratio of quality and running speed. Increasing scale factor reduces number of times we scan the whole image and increases running time but then we might skip a scale that would identify a face and thus miss it. Decreasing it will improve sensitivity but also increase running time quite a lot. First way to introduce parallelization would obviously be to distribute different window sizes across multiple workers. Next 
 idea is to split image into subimages so as to reduce space that needs to be scanned at each pass.
 
-For face recognition part... // TODO
+For face recognition part, we use Eigen Face Recognizer in OpenCV. We split the training image set to different nodes to enjoy data parallelism. For example, we have 800 labeled face images and 4 nodes, then we can deliver 200 images to each node. Every node will train an independent recognizer based on its training set. When a new face image come, we deliver it to every node, and every node will return a prediction result with confidence. We reduce these feedback to report the most confident one. 
+
+% Meng
+Inspired by HIPI\cite{sweeney2011hipi}, We want to implement an image bundle data structure. We pack float images into the bundle and the whole bundle can be exported as a text file, which is the default file format for Hadoop. 
 
 \section{Problem Statement} \label{sec:problem}
 
@@ -110,15 +124,28 @@ Obvious application in security systems is real-time location and identification
 
 When it comes to face recognition algorithms, we usually divide them in two groups. One is group of algorithms for face detection, and the other is group of algorithms for face recognition.
 
-Face detection is problem of determining locations and size of faces in input images. Output is usually a set of rectangles placed on the original image such that each rectangle contains a face. // More to fill in
+Face detection is a problem of determining locations and size of faces in input images. Output is usually a set of rectangles placed on the original image such that each rectangle contains a face. // More to fill in
 
-Face recognition is problem of identifying a given face with faces in a database and finding matches. // More to fill in
+Face recognition is a problem of identifying a given face with faces in a database. User will input a face image and the system should return the users identity. Some system even return a list of users that look similar to the input one. We don't provide similar face list in our system.// More to fill in
 
 \section{Proposed Solution} \label{sec:solution}
 
+\begin{figure}
+\centering
+\includegraphics[width=300, height=300]{img1}
+\caption{An illustration of image partitioning given the window size (maximum face size). Mesh with white lines is the cut based on window size. Green, yellow, red, purple and blue boxes represent examples of different scan areas. Scan areas overlap to make sure we don't miss any face on the boundary. Gray-shaded region represents parts of the image that cannot contain a face alone, because they are smaller than assumed face size.}
+\end{figure}
+
 Our project's work is separated into two parts. First part deals only with the problem of detecting faces in images.
 
+\begin{figure}
+\centering
+\includegraphics[height=300]{recog_overview}
+\caption{}
+\label{fig:recog_overview}
+\end{figure}
 
+For face recognition, we spread training images to different nodes to improve speed. In terms of mapreduce, each mapper will make its own prediction and emit (prediction, confidence) pairs as new value, see fig.\ref{fig:recog_overview}. The emit key is set to \textacutedblKEY\textacutedbl so that every prediction comes to the same reducer. Each reducer will combine these pairs, in the way that only the most confident one remains. We also introduce a Combiner to locally reduce mapper results. 
 
 \section{Evaluation} \label{sec:evaluation}
 

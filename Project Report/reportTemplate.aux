@@ -17,23 +17,25 @@
 \@writefile{toc}{\contentsline {section}{\numberline {III}Research Ideas}{4}}
 \newlabel{sec:ideas}{{III}{4}}
 \citation{sweeney2011hipi}
-\bibstyle{IEEEtran}
-\bibdata{./refs}
 \@writefile{toc}{\contentsline {section}{\numberline {IV}Problem Statement}{5}}
 \newlabel{sec:problem}{{IV}{5}}
-\@writefile{toc}{\contentsline {section}{\numberline {V}Proposed Solution}{5}}
-\newlabel{sec:solution}{{V}{5}}
-\@writefile{toc}{\contentsline {section}{\numberline {VI}Evaluation}{5}}
-\newlabel{sec:evaluation}{{VI}{5}}
+\bibstyle{IEEEtran}
+\bibdata{./refs}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces An illustration of image partitioning given the window size (maximum face size). Mesh with white lines is the cut based on window size. Green, yellow, red, purple and blue boxes represent examples of different scan areas. Scan areas overlap to make sure we don't miss any face on the boundary. Gray-shaded region represents parts of the image that cannot contain a face alone, because they are smaller than assumed face size.}}{6}}
+\@writefile{toc}{\contentsline {section}{\numberline {V}Proposed Solution}{6}}
+\newlabel{sec:solution}{{V}{6}}
+\@writefile{toc}{\contentsline {section}{\numberline {VI}Evaluation}{6}}
+\newlabel{sec:evaluation}{{VI}{6}}
 \bibcite{IWSCTV2001}{1}
 \bibcite{MIT2000}{2}
 \bibcite{IEEE1990}{3}
 \bibcite{CVPR1996}{4}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Distribute face recognition. (a) The training set is split so that every computing node has its own training data. Independent recognizers are trained in the trainning stage. (b) When a test image comes, we generate the input file for hadoop(the leftmost rectangle). It contains serialized recognizer, which contains all the required data to make a prediction, and the test image itself. Every line of the input file is distributed to a different mapper as input, and the output will be the prediction result, in (predict, confidence) pair. Reducers and Combiners will take these output to find the most confident result.}}{7}}
+\newlabel{fig:recog_overview}{{3}{7}}
+\@writefile{toc}{\contentsline {section}{\numberline {VII}Conclusions and Future Work}{7}}
+\newlabel{sec:conclusion}{{VII}{7}}
+\@writefile{toc}{\contentsline {section}{References}{7}}
 \bibcite{MSR2010}{5}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces An illustration of image partitioning given the window size (face size). Mesh with white lines is the cut based on window size. Green, yellow, red, purple and blue boxes represent examples of different scan areas. Gray-shaded region represents parts of the image that cannot contain a face alone, because they are smaller than assumed face size.}}{6}}
-\@writefile{toc}{\contentsline {section}{\numberline {VII}Conclusions and Future Work}{6}}
-\newlabel{sec:conclusion}{{VII}{6}}
-\@writefile{toc}{\contentsline {section}{References}{6}}
 \bibcite{TSU2010}{6}
 \bibcite{IC2012}{7}
 \bibcite{sweeney2011hipi}{8}

@@ -89,7 +89,7 @@ public class LocalFaceRecognition {
 //    	train(11, 21);
 //    	train(21, 31);
 //    	train(31, 41);
-//    	test(21, 31);
-    	genHadoopInput(17);
+    	test(21, 31);
+//    	genHadoopInput(17);
     }
 }
