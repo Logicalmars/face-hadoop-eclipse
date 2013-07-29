@@ -15,10 +15,10 @@ import java.util.StringTokenizer;
 
 import com.googlecode.javacpp.BytePointer;
 import com.googlecode.javacv.CanvasFrame;
+import com.googlecode.javacv.cpp.opencv_core.CvRect;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
-import static com.googlecode.javacv.cpp.opencv_core.cvCreateImage;
-import static com.googlecode.javacv.cpp.opencv_core.cvSize;
+import static com.googlecode.javacv.cpp.opencv_core.*;
 import static com.googlecode.javacv.cpp.opencv_highgui.*;
 
 import org.apache.commons.codec.binary.Base64;
@@ -51,7 +51,7 @@ public class Image2String {
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}		
 	}
 	
 	public String image2String(IplImage image) throws IOException
@@ -118,30 +118,76 @@ public class Image2String {
 		PrintWriter out = new PrintWriter(folder + "/collection.txt");
 		
 		File actual = new File(folder);
-		int count = 0;
 		for (File f : actual.listFiles())
 		{
-			if (f.getName().endsWith("ppm"))
+			System.out.println("converting: " + f.getName());
+			if (f.getName().endsWith("jpg"))
 			{
-				System.out.println("converting: " + f.getName());
 				final IplImage img = cvLoadImage(f.getPath());
-				if (img != null)
-				{					
-					out.println(f.getName() + "\t" + new Image2String().image2String(img));
-					count ++;
+				if ( img == null ) {
+					System.out.println("fail");;
+					return;
 				}
-				else
-					System.out.println("fail");
+				final double scaleFactor = 1.05;
+				final int minimumSize = 25;
+				for ( int windowSize = Math.min(img.height(), img.width()); windowSize >= minimumSize; windowSize /= scaleFactor ) {
+					for ( int top = 0; top + windowSize < img.height(); top += windowSize ) {
+						for ( int left = 0; left + windowSize < img.width(); left += windowSize ) {
+							int width = Math.min( 2 * windowSize, img.width() - left);
+							int height = Math.min( 2 * windowSize, img.height() - top); 
+							CvRect roi = new CvRect( left, top, width, height );
+							cvSetImageROI( img, roi );
+							IplImage img2 = cvCreateImage(cvSize(roi.width(), roi.height()), img.depth(), img.nChannels());
+							cvCopy(img, img2, null);
+							cvResetImageROI(img);
+							out.println(f.getName() + "|" + ( top ) + "|" + ( left ) + "|" + ( windowSize ) + "\t" + new Image2String().image2String(img2));
+						}
+					}
+				}
+//				if (img != null)
+//					out.println(f.getName() + "\t" + new Image2String().image2String(img));
+//				else
+//					System.out.println("fail");
 			}
-			
-			if (count == 100)
-				break;
 		}
 	}
 	
+	public static void drawStuff() {
+		final IplImage img = cvLoadImage("data/558727_276661645768104_1911319099_n.jpg");
+		
+		try {
+			BufferedReader br = new BufferedReader(new FileReader("data/part-r-00000"));
+			String line;
+			while ( ( line = br.readLine() ) != null ) {
+				String[] tokens = line.split( "\\s" );
+//				for ( String token : tokens ) {
+//					System.out.println( token );
+//				}
+//				System.out.println(line);
+				String filename = tokens[ 0 ];
+//				System.out.println(filename);
+				int x = Integer.valueOf( tokens[ 1 ] );
+				int y = Integer.valueOf( tokens[ 2 ] );
+				int width = Integer.valueOf( tokens[ 3 ] );
+				int height = Integer.valueOf( tokens[ 4 ] );
+				cvRectangle(img, cvPoint(x, y), cvPoint(x + width, y + height), CvScalar.RED, 5, CV_AA, 0);
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Image2String c = new Image2String();
+		c.show(img, "My Image");
+	}
+	
 	public static void main(String[] args) throws IOException {
-		encodingFolder("/home/linmengl/workspace/data/Meng");
+		encodingFolder("group");
 //		encodingTest();
-//		new Image2String().show_collection("/home/linmengl/workspace/data/MengSmall/part-m-00000", 5);
+//		new Image2String().show_collection("data/collection.txt", 5);
+		
+//		drawStuff();
 	}
 }

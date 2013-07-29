@@ -13,26 +13,40 @@ import static com.googlecode.javacv.cpp.opencv_imgproc.cvCvtColor;
 import static com.googlecode.javacv.cpp.opencv_objdetect.cvHaarDetectObjects;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
+import java.util.Iterator;
+import java.util.StringTokenizer;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.Reducer.Context;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.KeyValueTextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
+import com.googlecode.javacv.cpp.opencv_core.*;
+
+import static com.googlecode.javacv.cpp.opencv_highgui.*;
+
 import com.googlecode.javacv.cpp.opencv_core.CvMemStorage;
 import com.googlecode.javacv.cpp.opencv_core.CvRect;
 import com.googlecode.javacv.cpp.opencv_core.CvScalar;
 import com.googlecode.javacv.cpp.opencv_core.CvSeq;
+import com.googlecode.javacv.cpp.opencv_core.CvSize;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 import com.googlecode.javacv.cpp.opencv_objdetect.CvHaarClassifierCascade;
+
+import edu.vt.io.Image;
 
 public class TextFaceDetection extends Configured implements Tool{
 
@@ -81,23 +95,50 @@ public class TextFaceDetection extends Configured implements Tool{
 			
 			IplImage img = c.string2Image(value.toString());
 			
+			StringTokenizer line = new StringTokenizer(key.toString(), "|");
+			
+			if ( !line.hasMoreTokens() ) System.err.println("Oh my God, no tokens!! " );
+			String filename = line.nextToken();
+			System.err.println( key + " " + filename );
+			if ( !line.hasMoreTokens() ) System.err.println("Oh my God, no more tokens after filename!! " );
+			int top = Integer.valueOf( line.nextToken() );
+			if ( !line.hasMoreTokens() ) System.err.println("Oh my God, no more tokens after top!! " );
+			int left = Integer.valueOf( line.nextToken() );
+			if ( !line.hasMoreTokens() ) System.err.println("Oh my God, no more tokens after left!! " );
+			int windowSize = Integer.valueOf( line.nextToken() );
+			
 			// setup gray image
 			IplImage grayImage = IplImage.create(img.width(), img.height(), IPL_DEPTH_8U, 1);
 	        cvCvtColor(img, grayImage, CV_BGR2GRAY);
-	 
+	        
 	        // We detect the faces.	        
-	        CvSeq faces = cvHaarDetectObjects(grayImage, classifier, storage, 1.5, 3, 0);
-	 
+	        CvSeq faces = cvHaarDetectObjects(grayImage, classifier, storage, 1.05, 2, 0, new CvSize(windowSize, windowSize), new CvSize(windowSize, windowSize));
 	        // We iterate over the discovered faces and draw red rectangles
 	        // around them.
+	        
+	        String output = "";
+	        
 	        for (int i = 0; i < faces.total(); i++) {
 	            CvRect r = new CvRect(cvGetSeqElem(faces, i));
-	            cvRectangle(img, cvPoint(r.x(), r.y()), cvPoint(r.x() + r.width(), r.y() + r.height()), CvScalar.RED, 5, CV_AA, 0);
+	            output += ( left + r.x() ) + " " + ( top + r.y() ) + " " + r.width() + " " + r.height() + " ";
+//	            cvRectangle(img, cvPoint(r.x(), r.y()), cvPoint(r.x() + r.width(), r.y() + r.height()), CvScalar.RED, 5, CV_AA, 0);
 	        }
 			
-	        context.write(key, new Text(c.image2String(img)));
+	        if ( output != "" ) context.write(new Text( filename ), new Text( output ));
 		}
-	}	
+	}
+	
+	public static class FaceDetectionReducer extends Reducer<Text, Text, Text, Text> {
+
+		@Override
+		public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+
+			Iterator<Text> it = values.iterator();
+			while (it.hasNext()) {
+				context.write(key, it.next());
+			}
+		}
+	}
 
 	public static void main(String[] args) throws Exception {		
 		long t = cvGetTickCount();		
@@ -115,7 +156,7 @@ public class TextFaceDetection extends Configured implements Tool{
 		job.setJarByClass(TextFaceDetection.class);
 		
 		job.setMapperClass(FaceDetectionMapper.class);				
-		job.setNumReduceTasks(0);
+		job.setReducerClass(FaceDetectionReducer.class);
 		
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(Text.class);
