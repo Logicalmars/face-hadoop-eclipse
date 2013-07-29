@@ -4,38 +4,59 @@
 \citation{IWSCTV2001}
 \citation{MIT2000}
 \citation{IEEE1990}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces An example of face detection using OpenCV. Image taken from wikipedia: \unhbox \voidb@x \begingroup \begingroup \let \relax \relax \relax \endgroup \Url {http://en.wikipedia.org/wiki/File:Face_detection.jpg}}}{2}}
+\@writefile{toc}{\contentsline {section}{\numberline {II}Related Work}{2}}
+\newlabel{sec:related}{{II}{2}}
+\citation{MIT1991}
+\citation{JMLR2002}
 \citation{CVPR1996}
 \citation{IWSCTV2001}
 \citation{MSR2010}
 \citation{TSU2010}
 \citation{IC2012}
-\@writefile{toc}{\contentsline {section}{\numberline {II}Related Work}{3}}
-\newlabel{sec:related}{{II}{3}}
 \citation{sweeney2011hipi}
 \citation{sweeney2011hipi}
+\citation{zhang2010case}
+\citation{wikiImage}
 \@writefile{toc}{\contentsline {section}{\numberline {III}Research Ideas}{4}}
 \newlabel{sec:ideas}{{III}{4}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces An example of face detection using OpenCV. Image taken from wikipedia \cite  {wikiImage}}}{5}}
 \citation{sweeney2011hipi}
-\@writefile{toc}{\contentsline {section}{\numberline {IV}Problem Statement}{5}}
-\newlabel{sec:problem}{{IV}{5}}
+\@writefile{toc}{\contentsline {section}{\numberline {IV}Problem Statement}{6}}
+\newlabel{sec:problem}{{IV}{6}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces An illustration of image partitioning given the window size (assumed face size). Mesh with white lines is the cut based on window size. Green, yellow, red, purple and blue boxes represent examples of different scan areas. Scan areas overlap to make sure we don't miss any face on the boundary. Gray-shaded region represents parts of the image that cannot contain a face alone, because they are smaller than assumed face size.}}{7}}
+\@writefile{toc}{\contentsline {section}{\numberline {V}Proposed Solution}{7}}
+\newlabel{sec:solution}{{V}{7}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\unhbox \voidb@x \hbox {V-A}}Face Detection}{7}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Diagram of the face detection framework. First, input image is split into many subimages and they are given as input to MapReduce.}}{7}}
+\citation{faceRecognizer}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\unhbox \voidb@x \hbox {V-B}}Face Recognition}{8}}
+\citation{sweeney2011hipi}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Distributed face recognition. (a) The training set is split so that every computing node has its own training data. Independent classifiers are trained in the trainning stage. (b) When a test image arrives, we generate the input file for hadoop (the leftmost rectangle). It contains serialized classifier, which contains all the required data to make a prediction, and the test image itself. Every line of the input file is distributed to a different mapper as input, and the output will be the prediction result, in (prediction, confidence) pair. Reducers and Combiners will take these outputs to find the most confident result.}}{9}}
+\newlabel{fig:recog_overview}{{4}{9}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\unhbox \voidb@x \hbox {V-C}}General Hadoop Image Process}{9}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Trained eigenfaces. All the database images are normalized to the same size before training.}}{10}}
+\newlabel{fig:eigenfaces}{{5}{10}}
+\@writefile{toc}{\contentsline {section}{\numberline {VI}Evaluation}{10}}
+\newlabel{sec:evaluation}{{VI}{10}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Detailed workflow of face detection on hadoop. (a) Input image is first segmented according to different window sizes, then serialized into text string, and stored in Map input text. Filename together with window position and size are used as key. (b) Each mapper is fed with one line from the Map input text, and a sub-image can be de-serialized. We run OpenCV face detection with fixed window size on this sub-image. If there is a face, the surrounding rectangle will be emitted to reducer. The reducer merges overlapping rectangles into one.}}{11}}
+\newlabel{fig:hadoop_face_detection}{{6}{11}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Subimages accross different scales. a) Example of a big window scale, not many subimages to check. b) Smaller scale of search window. Number of subimages increases exponentially. c) Smallest window scale. We have a big number of small subimages. }}{11}}
+\newlabel{tab:face_recog}{{VI}{12}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Face detection without segmenting. (Raw detection). This illustrates, small number of face detection on the cloud is naturally slow, since we have much overhead on node setup and communication.}}{12}}
+\newlabel{tab:face_recog}{{VI}{12}}
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Face Recognition runtime on Amazon. The testing database is quit small, and we found node setup time dominates, since we don't have better performance with more nodes.}}{12}}
+\newlabel{tab:seg_face_detect}{{VI}{12}}
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Experiments on segmented face detection. The segmented results are big in size, and most of the time is used to setup hadoop nodes. We can find this comparing the last two columns in the table. In the local hadoop, there is only one node and mappers start to work rightaway.}}{12}}
 \bibstyle{IEEEtran}
 \bibdata{./refs}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces An illustration of image partitioning given the window size (maximum face size). Mesh with white lines is the cut based on window size. Green, yellow, red, purple and blue boxes represent examples of different scan areas. Scan areas overlap to make sure we don't miss any face on the boundary. Gray-shaded region represents parts of the image that cannot contain a face alone, because they are smaller than assumed face size.}}{6}}
-\@writefile{toc}{\contentsline {section}{\numberline {V}Proposed Solution}{6}}
-\newlabel{sec:solution}{{V}{6}}
-\@writefile{toc}{\contentsline {section}{\numberline {VI}Evaluation}{6}}
-\newlabel{sec:evaluation}{{VI}{6}}
 \bibcite{IWSCTV2001}{1}
 \bibcite{MIT2000}{2}
 \bibcite{IEEE1990}{3}
 \bibcite{CVPR1996}{4}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Distribute face recognition. (a) The training set is split so that every computing node has its own training data. Independent recognizers are trained in the trainning stage. (b) When a test image comes, we generate the input file for hadoop(the leftmost rectangle). It contains serialized recognizer, which contains all the required data to make a prediction, and the test image itself. Every line of the input file is distributed to a different mapper as input, and the output will be the prediction result, in (predict, confidence) pair. Reducers and Combiners will take these output to find the most confident result.}}{7}}
-\newlabel{fig:recog_overview}{{3}{7}}
-\@writefile{toc}{\contentsline {section}{\numberline {VII}Conclusions and Future Work}{7}}
-\newlabel{sec:conclusion}{{VII}{7}}
-\@writefile{toc}{\contentsline {section}{References}{7}}
 \bibcite{MSR2010}{5}
 \bibcite{TSU2010}{6}
 \bibcite{IC2012}{7}
 \bibcite{sweeney2011hipi}{8}
+\@writefile{toc}{\contentsline {section}{\numberline {VII}Conclusions and Future Work}{13}}
+\newlabel{sec:conclusion}{{VII}{13}}
+\@writefile{toc}{\contentsline {section}{References}{13}}

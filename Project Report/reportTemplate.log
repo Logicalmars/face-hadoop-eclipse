@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.10.7)  28 JUL 2013 19:19
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.10.7)  29 JUL 2013 12:29
 entering extended mode
  %&-line parsing enabled.
 **reportTemplate.tex
@@ -266,6 +266,14 @@ Package: verbatim 2003/08/22 v1.5q LaTeX2e package for verbatim enhancements
 \verbatim@line=\toks26
 \verbatim@in@stream=\read1
 )
+(/usr/share/texmf-texlive/tex/latex/wrapfig/wrapfig.sty
+\wrapoverhang=\dimen144
+\WF@size=\dimen145
+\c@WF@wrappedlines=\count113
+\WF@box=\box30
+\WF@everypar=\toks27
+Package: wrapfig 2003/01/31  v 3.6
+)
 (/usr/share/texmf-texlive/tex/latex/graphics/color.sty
 Package: color 2005/11/14 v1.0j Standard LaTeX Color (DPC)
 
@@ -274,172 +282,173 @@ File: color.cfg 2007/01/18 v1.5 color configuration of teTeX/TeXLive
 )
 Package color Info: Driver file: pdftex.def on input line 130.
 )
-\c@thm=\count113
-\c@dfn=\count114
-\c@pbm=\count115
-\c@claim=\count116
+\c@thm=\count114
+\c@dfn=\count115
+\c@pbm=\count116
+\c@claim=\count117
  (./macros.tex
-\c@Convention=\count117
-\c@Definition=\count118
-\c@Theorem=\count119
-\c@Example=\count120
-\c@Remark=\count121
-\c@Notation=\count122
-\c@F=\count123
-\c@Lemma=\count124
-\c@Corol=\count125
-\c@Lcorol=\count126
-\c@Proposition=\count127
-\c@leftindent=\count128
-) (./reportTemplate.aux)
+\c@Convention=\count118
+\c@Definition=\count119
+\c@Theorem=\count120
+\c@Example=\count121
+\c@Remark=\count122
+\c@Notation=\count123
+\c@F=\count124
+\c@Lemma=\count125
+\c@Corol=\count126
+\c@Lcorol=\count127
+\c@Proposition=\count128
+\c@leftindent=\count129
+) (./reportTemplate.aux
+
+LaTeX Warning: Label `tab:face_recog' multiply defined.
+
+)
 \openout1 = `reportTemplate.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-
-(/usr/share/texmf-texlive/tex/context/base/supp-pdf.mkii
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+ (/usr/share/texmf-texlive/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count129
-\scratchdimen=\dimen144
-\scratchbox=\box30
-\nofMPsegments=\count130
-\nofMParguments=\count131
-\everyMPshowfont=\toks27
-\MPscratchCnt=\count132
-\MPscratchDim=\dimen145
-\MPnumerator=\count133
-\everyMPtoPDFconversion=\toks28
+\scratchcounter=\count130
+\scratchdimen=\dimen146
+\scratchbox=\box31
+\nofMPsegments=\count131
+\nofMParguments=\count132
+\everyMPshowfont=\toks28
+\MPscratchCnt=\count133
+\MPscratchDim=\dimen147
+\MPnumerator=\count134
+\everyMPtoPDFconversion=\toks29
 ) [1
 Non-PDF special ignored!{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
-<img2.jpg, id=7, 803.0pt x 537.00626pt>
-! Illegal unit of measure (pt inserted).
-<to be read again> 
-                   \relax 
-l.80 \includegraphics[width=300]{img2}
-                                      
-Dimensions can be in units of em, ex, in, pt, pc,
-cm, mm, dd, cc, nd, nc, bp, or sp; but yours is a new one!
-I'll assume that you meant to say pt, for printer's points.
-To recover gracefully from this error, it's best to
-delete the erroneous units; e.g., type `2' to delete
-two letters. (See Chapter 27 of The TeXbook.)
+[2]
 
-! Illegal unit of measure (pt inserted).
-<to be read again> 
-                   \relax 
-l.80 \includegraphics[width=300]{img2}
-                                      
-Dimensions can be in units of em, ex, in, pt, pc,
-cm, mm, dd, cc, nd, nc, bp, or sp; but yours is a new one!
-I'll assume that you meant to say pt, for printer's points.
-To recover gracefully from this error, it's best to
-delete the erroneous units; e.g., type `2' to delete
-two letters. (See Chapter 27 of The TeXbook.)
+LaTeX Warning: Citation `MIT1991' on page 3 undefined on input line 82.
 
-File: img2.jpg Graphic file (type jpg)
-<use img2.jpg>
-! Undefined control sequence.
-\Url Error ->\url used in a moving argument. 
-                                             
-l.81 ...kipedia.org/wiki/File:Face_detection.jpg}}
-                                                  
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
 
-LaTeX Font Info:    Try loading font information for U+msa on input line 81.
+LaTeX Warning: Citation `JMLR2002' on page 3 undefined on input line 82.
+
+[3]
+
+LaTeX Warning: Citation `zhang2010case' on page 4 undefined on input line 98.
+
+LaTeX Font Info:    Calculating math sizes for size <11> on input line 98.
+LaTeX Font Info:    Try loading font information for U+msa on input line 98.
 (/usr/share/texmf-texlive/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2009/06/22 v3.00 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 81.
+LaTeX Font Info:    Try loading font information for U+msb on input line 98.
 
 (/usr/share/texmf-texlive/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2009/06/22 v3.00 AMS symbols B
-) [2 <./img2.jpg>] [3]
-[4] <img1.jpg, id=17, 506.89375pt x 506.89375pt>
-! Illegal unit of measure (pt inserted).
-<to be read again> 
-                   \relax 
-l.135 ...ludegraphics[width=300, height=300]{img1}
-                                                  
-Dimensions can be in units of em, ex, in, pt, pc,
-cm, mm, dd, cc, nd, nc, bp, or sp; but yours is a new one!
-I'll assume that you meant to say pt, for printer's points.
-To recover gracefully from this error, it's best to
-delete the erroneous units; e.g., type `2' to delete
-two letters. (See Chapter 27 of The TeXbook.)
+)
+<img2.jpg, id=13, 803.0pt x 537.00626pt>
+File: img2.jpg Graphic file (type jpg)
+ <use img2.jpg>
 
-! Illegal unit of measure (pt inserted).
-<to be read again> 
-                   \relax 
-l.135 ...ludegraphics[width=300, height=300]{img1}
-                                                  
-Dimensions can be in units of em, ex, in, pt, pc,
-cm, mm, dd, cc, nd, nc, bp, or sp; but yours is a new one!
-I'll assume that you meant to say pt, for printer's points.
-To recover gracefully from this error, it's best to
-delete the erroneous units; e.g., type `2' to delete
-two letters. (See Chapter 27 of The TeXbook.)
+LaTeX Warning: Citation `wikiImage' on page 4 undefined on input line 104.
 
+[4] [5 <./img2.jpg>]
+
+! LaTeX Error: File `faceDetection1' not found.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.142 ...udegraphics[height=300pt]{faceDetection1}
+                                                  
+I could not locate the file with any of these extensions:
+.png,.pdf,.jpg,.mps,.jpeg,.jbig2,.jb2,.PNG,.PDF,.JPG,.JPEG,.JBIG2,.JB2
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+[6] <img1.jpg, id=24, 506.89375pt x 506.89375pt>
 File: img1.jpg Graphic file (type jpg)
-<use img1.jpg> <recog_overview.jpg, id=18, 982.67125pt x 709.65125pt>
-! Illegal unit of measure (pt inserted).
-<to be read again> 
-                   \relax 
-l.143 \includegraphics[height=300]{recog_overview}
-                                                  
-Dimensions can be in units of em, ex, in, pt, pc,
-cm, mm, dd, cc, nd, nc, bp, or sp; but yours is a new one!
-I'll assume that you meant to say pt, for printer's points.
-To recover gracefully from this error, it's best to
-delete the erroneous units; e.g., type `2' to delete
-two letters. (See Chapter 27 of The TeXbook.)
-
-! Illegal unit of measure (pt inserted).
-<to be read again> 
-                   \relax 
-l.143 \includegraphics[height=300]{recog_overview}
-                                                  
-Dimensions can be in units of em, ex, in, pt, pc,
-cm, mm, dd, cc, nd, nc, bp, or sp; but yours is a new one!
-I'll assume that you meant to say pt, for printer's points.
-To recover gracefully from this error, it's best to
-delete the erroneous units; e.g., type `2' to delete
-two letters. (See Chapter 27 of The TeXbook.)
-
+ <use img1.jpg> [7 <./img1.jpg>] <recog_overview.jpg, id=30, 982.67125pt x 709.
+65125pt>
 File: recog_overview.jpg Graphic file (type jpg)
-<use recog_overview.jpg> [5] (./reportTemplate.bbl [6 <./img1.jpg>]
+
+<use recog_overview.jpg>
+
+LaTeX Warning: Citation `faceRecognizer' on page 8 undefined on input line 175.
+
+
+Missing character: There is no â in font ptmr7t!
+Missing character: There is no € in font ptmr7t!
+Missing character: There is no ™ in font ptmr7t!
+[8] <eigenfaces.png, id=36, 461.725pt x 224.84pt>
+File: eigenfaces.png Graphic file (type png)
+ <use eigenfaces.png>
+Overfull \hbox (146.38878pt too wide) in paragraph at lines 185--186
+ [][] 
+ []
+
+<hadoop_face_detection.jpg, id=37, 963.6pt x 722.7pt>
+File: hadoop_face_detection.jpg Graphic file (type jpg)
+
+<use hadoop_face_detection.jpg> [9 <./recog_overview.jpg>]
+
+! LaTeX Error: File `segmentScales' not found.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.205 ...graphics[width=\textwidth]{segmentScales}
+                                                  
+I could not locate the file with any of these extensions:
+.png,.pdf,.jpg,.mps,.jpeg,.jbig2,.jb2,.PNG,.PDF,.JPG,.JPEG,.JBIG2,.JB2
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+[10 <./eigenfaces.png (PNG copy)>] [11 <./hadoop_face_detection.jpg>]
+Overfull \hbox (2.1057pt too wide) in paragraph at lines 246--253
+[][] 
+ []
+
+[12] (./reportTemplate.bbl
 Missing character: There is no â in font ptmri7t!
 Missing character: There is no € in font ptmri7t!
 Missing character: There is no “ in font ptmri7t!
- [7 <./recog_overview.jpg>]) [8] (./reportTemplate.aux) ) 
+) [13] (./reportTemplate.aux)
+
+LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: There were multiply-defined labels.
+
+ ) 
 Here is how much of TeX's memory you used:
- 3478 strings out of 493848
- 45779 string characters out of 1152823
- 105075 words of memory out of 3000000
- 6706 multiletter control sequences out of 15000+50000
- 37292 words of font info for 76 fonts, out of 3000000 for 9000
+ 3589 strings out of 493848
+ 47301 string characters out of 1152823
+ 107352 words of memory out of 3000000
+ 6799 multiletter control sequences out of 15000+50000
+ 41149 words of font info for 80 fonts, out of 3000000 for 9000
  714 hyphenation exceptions out of 8191
- 32i,9n,24p,1043b,407s stack positions out of 5000i,500n,10000p,200000b,50000s
-{/usr/share/texmf-texl
-ive/fonts/enc/dvips/base/8r.enc}</usr/share/texmf-texlive/fonts/type1/urw/times
-/utmb8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmr8a.pfb></usr/sh
-are/texmf-texlive/fonts/type1/urw/times/utmri8a.pfb>
-Output written on reportTemplate.pdf (8 pages, 222174 bytes).
+ 32i,8n,25p,1038b,218s stack positions out of 5000i,500n,10000p,200000b,50000s
+{/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.enc}</usr/share/texmf-texli
+ve/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-texlive/fonts/ty
+pe1/public/amsfonts/cm/cmmi8.pfb></usr/share/texmf-texlive/fonts/type1/public/a
+msfonts/cm/cmr10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/c
+mr8.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmsy10.pfb></u
+sr/share/texmf-texlive/fonts/type1/urw/times/utmb8a.pfb></usr/share/texmf-texli
+ve/fonts/type1/urw/times/utmr8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/t
+imes/utmri8a.pfb>
+Output written on reportTemplate.pdf (13 pages, 453904 bytes).
 PDF statistics:
- 45 PDF objects out of 1000 (max. 8388607)
+ 83 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 16 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 26 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -169,19 +169,21 @@ For face recognition, the idea is to assign training images to different nodes, 
 
 In the training phase, we split the training data into several folds, and each fold will generate an independent recognizer. We can dump these recognizers to file system. Then, in the testing phase, when a new test image comes, we generate a Hadoop input file. This file contains the recognizers and the test image in each line, which will be distributed to each mapper later on. Every mapper will load the recognizer data and make its own prediction for the test image. (Prediction, Confidence) pairs are emitted as values to the reducer. The emitted keys are always ''KEY'' so that every prediction comes to the same reducer. The reducer will combine these pairs, in the way that only the most confident one remains. We also introduce a Combiner to locally reduce mapper results.
 
-In order to reduce data transmition, we only put the file path of recognizers in the hadoop input. All the recognizers are copied to hadoop nodes before testing.
+In order to reduce data transmission, we only put the file path of recognizers in the Hadoop input. All the recognizers are copied to hadoop nodes before testing.
 
-To train independent recognizers, we use $EigenFaceRecognizer$, which analyze training images with The Principal Component Analysis (PCA). PCA will greatly reduce the dimensionality of image representation, so that we only focus on the components that account for most of the information.\cite{faceRecognizer}. The Eigenfaces method recognize face in three major steps:
+To train independent recognizers, we use $EigenFaceRecognizer$, which analyze training images with The Principal Component Analysis (PCA). PCA will greatly reduce the dimensionality of image representation, so that we only focus on the components that account for most of the information \cite{faceRecognizer}. The Eigenfaces method recognizes face in three major steps:
 
-1. Do PCA on training face set, and project all the training samples into PCA subspace.
-2. Project the query image into the PCA subspace.
-3. Finding the nearest neighbor inside PCA subspace, and determine query image’s label based on them.
+\begin{enumerate}
+\item Do PCA on training face set, and project all the training samples into PCA subspace.
+\item Project the query image into the PCA subspace.
+\item Find nearest neighbor(s) inside PCA subspace, and determine query image’s label based on it.
+\end{enumerate}
 
-The result of the first step contains all the information needed by a $recognizer$, so we dump it into the hard disk. The information includes eigenvalues, eigenvectors and projections of all training images. Some eigenfaces can be seen in Fig.\ref{fig:eigenfaces}.
+The result of the first step contains all the information needed by a $recognizer$, so we dump it into the hard disk. The information includes eigenvalues, eigenvectors and projections of all training images. Some eigenfaces can be seen in Fig. \ref{fig:eigenfaces}.
 
 \begin{figure}
 \centering
-\includegraphics[height=300pt]{eigenfaces}
+\includegraphics[width=300pt]{eigenfaces}
 \caption{Trained eigenfaces. All the database images are normalized to the same size before training.}
 \label{fig:eigenfaces}
 \end{figure}
@@ -209,21 +211,75 @@ We take face detection as an example and detailed workflow is shown in Fig. \ref
 
 In this part, we evaluate the speed of face detection and recognition. The accuracy is not evaluated due to aim of our project to be a generalized framework allowing any classifier to be used and because it is based on how well OpenCV handles small search windows with fixed scale.
 
+\subsection{Face Detection}
+
 The solutions have been tested on both Hadoop local filesystem and on Amazon cloud. Implementation was done using JavaCV (java version of OpenCV). For face detection, in pre-processing stage all input images are segmented across different face sizes and stored in a collection input text file. In mapping stage of face detection, subimages were read with filename, coordinates and dimensions as keys and string encoding of the image as value. On each subimage, OpenCV's Haar classifier method was invoked to find faces with fixed window size. Mapping output is filename as key and coordinates of rectangles (with offsets relative to original unsegmented image) that contain faces as values. In reduce stage, all rectangles that belong to same image are grouped due to having same key, ready to be post-processed by rectangle-averaging algorithm to remove redundancy in output rectangles.
 
-Average running time on local Hadoop Mapreduce for a single image is around 28 seconds and for 10 images it is 65 seconds, giving us average time of roughly 4 seconds per image ignoring time spent on initialization of nodes and starting the job. On Amazon EMR, using one master node and 5 small worker nodes, time spent on processing single image was around 96 seconds, while time spent on processing 10 images was around 140 seconds
+Average running time on local Hadoop Mapreduce for a single image is around 28 seconds and for 10 images it is 65 seconds, giving us average time of roughly 4 seconds per image ignoring time spent on initialization of nodes and starting the job. On Amazon EMR, using one master node and 5 small worker nodes, time spent on processing single image was around 96 seconds, while time spent on processing 10 images was around 140 seconds, giving us average time of 4.9 seconds per image.
 
-The biggest drawback of the face detection framework are repetitions. For each image and each window size, subimages were generated according to partition based on window size. As can be easily seen on Fig. 5, this introduces a lot of repeated segments of the image being copied over and over. Since there are $\log_{scaleFactor}{imageSize}$ different window sizes and almost all windows are repeated in 4 scan areas, given a fixed window size, there is approximately $O(\frac{imageSize}{minimumWindowSize})^{2} $ subimages, which is a lot. With scale factor 1.05 and minimum window size 25, more than 100MB big input file is generated for an image of size 650x500.
+We compared it to Amazon EMR application which simply runs OpenCV on original image and running time achieved with raw OpenCV is 51 seconds for 5 pictures, being double as fast and using only traffic needed to send image once, implying that our solution needs further optimizations both in implementation and algorithm to be feasible in practice.
 
-FDSegment: 1pic: 187MB, 95.66s; 4 pic: 870MB, 111.11s; 10 pic: 1.7GB, 140.37s (1 master, 5 core); 64.94s (local hadoop)
-FRDist: 2 core: 69.92s, 4 core: 85.66s
-Raw opencv face detection: 12.75s/100pics , Amazon raw face detection: 51s/5pics
+Another implementation was done, using only image paths on Hadoop file system and coordinates of subimages as input, thus reducing whole input to mere kilobytes and optimizing space requirements and traffic. However, due to limitations of MapReduce model, we had to load images every time we were to analyse a subimage in mapper thus invoking many system calls and increasing running time to impractical values. However, finding a way around the limitations of MapReduce and succeeding in loading each required image to memory of worker only once, thus being able to quickly fetch subimages we need would lead to results this project was aiming at from the beginning.
+
+Currently, the biggest drawback of the used face detection framework are repetitions. For each image and each window size, subimages were generated according to partition based on window size. As can be easily seen on Fig. 5, this introduces a lot of repeated segments of the image being copied over and over. Since there are $\log_{scaleFactor}{imageSize}$ different window sizes and almost all windows are repeated in 4 scan areas, given a fixed window size, there is approximately $O(\frac{imageSize}{minimumWindowSize})^{2} $ subimages, which is a lot. With scale factor 1.05 and minimum window size 25, more than 100MB big input file is generated for an image of size 650x500. This means that a lot of network traffic will be used for transferring same parts of images using much of bandwidth and also increasing running time due to huge input.
+
+Perhaps the main thing to have in mind is that computationally, the jobs that were running on nodes were not at all expensive so most of the time was spent on transferring and reading input, making it impossible to use the distributed architecture to its full extent. Next step would be implementing our own classifier to gain full control over the parallel architecture of the framework enabling further optimizations.
+\begin{figure} \label{tab:seg_face_detect}
+
+  \begin{tabular}{|c|c|c|c|c|}
+  \hline
+  & 1 image & 4 images & 10 images (Amazon) & 10 images (Local hadoop) \\ \hline
+  Collection size & 187MB & 870MB & 1.7GB & 1.7GB\\ \hline
+  Segmented Face Detection & 95.66s & 111.11s & 140.37s & 64.94s \\
+  \hline  
+  \end{tabular}
+  
+  \caption{Experiments on segmented face detection. The segmented results are big in size, and most of the time is used to setup hadoop nodes. We can find this comparing the last two columns in the table. In the local hadoop, there is only one node and mappers start to work right away.}
+\end{figure}
+
+\begin{figure} \label{tab:raw_face}
+ \centering
+ \begin{tabular} {|c|c|}
+  \hline
+  Raw OpenCV & Raw on Amazon Hadoop\\ \hline
+  0.1275s/image & 10s/image \\ \hline
+ \end{tabular}
+ 
+ \caption{Face detection without segmenting. (Raw detection). This illustrates, small number of face detection on the cloud is naturally slow, since we have much overhead on node setup and communication.}
+\end{figure}
+
+\subsection{Face Recognition}
+To evaluate face recognition, we employed The ORL face database \cite{ORLdatabase}. This database contains 40 individuals and each individual has 10 photos. We used 9 of them in training set, leaving 1 for the test. With eigenface recognizer, we received 95% of accuracy, and we managed to run distributed face recognition on Amazon EMR (Fig. \ref{tab:face_recog}).
+
+The results are not very good, and we don’t gain speedup when we add more computing nodes. The reason is that the training image set is too small, so that each recognizer does its job very quickly. Most of the time is spent on node setup and communication.  We could further test our algorithm on larger databases such as FERET \cite{phillips2000feret} or Yale face database \cite{georghiades1997yale}.
+
+\begin{figure} \label{tab:face_recog}
+ \centering
+ \begin{tabular} {|c|c|c|}
+  \hline
+  Number of core nodes & 2 & 4 \\ \hline
+  Runtime & 69.92s & 85.66s \\ \hline
+ \end{tabular}
+ 
+ \caption{Face Recognition runtime on Amazon. The testing database is quite small, and we found node setup time dominates, since we don't have better performance with more nodes.}
+\end{figure}
+
+\subsection{Amazon Setup}
+We took a lot of effort to make things work on Amazon Elastic MapReduce(EMR). EMR provides computing utility on a pay-per-use base. With EMR, our program can easily scale, from 1 computing nodes to 10 with the only difference on job configuration. 
+
+EMR loads input data directly from Amazon S3 service, so we created and uploaded collection files onto S3 servers. Since we use OpenCV, we needed to compile it locally on Amazon’s computing node. Our code needed to be compiled and linked to these locally compiled libraries, thus introducing some dependence on the running environment. For example, we would need to re-compile OpenCV if we wanted to run our program on Amazon’s 64bits large Instances. Currently our code runs on m1.small instances. 
+
+It is also required to bootstrap computing nodes, installing required dependencies, and pulling data on local disks such as face classifiers and recognizers. This are done in a bootstrap script which runs just after every node starts. 
+
+During the setup, we found ssh into real computing node very useful. Some problems can only be spotted on the real machine, such as missing required libraries. In our bootstrap script, a bash command would ask user a “yes/no” question and suspend there forever. We spotted this problem and past $-y$ to solve the problem. 
 
 \section{Conclusions and Future Work} \label{sec:conclusion}
 
-What are the lessons that we should learn from this paper? 
-What are the possible extensions of this work?
+Facial recognition and detection on distributed systems remain interesting and challenging problems. It surely deserves more attention in hope to overcome problems with traffic and redundancy in input that are currently present. This project serves as an example of easily implementable face detection and recognition framework. Our implementation can easily scale up and has good reliability. 
 
+Things that need to be taken care of when dealing with face detection would be to reduce traffic and optimize input. Next step would be to find a way to load images only once allowing for quick subimage extraction and increasing performance while reducing the input.
+
+What we learnt about hadoop is, it’s only excellent when data size is huge. Distributed FS and task management all introduce big overhead. Anyway, hadoop is our friend when we face data intensive problems in the future. 
 
 %%% The References (are kept in a separate file "refs.bib" in this example. 
 \bibliographystyle{IEEEtran}   
